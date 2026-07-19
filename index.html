@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏推荐测验 - 找你的完美桌游</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f0f8ff; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        .question { margin: 20px 0; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 10px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        #results { margin-top: 30px; text-align: center; }
+        .game-card { border: 1px solid #ddd; padding: 15px; margin: 10px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 你的完美游戏推荐测验</h1>
+        <p>回答以下问题，我们帮你推荐最适合的游戏！游戏包括国际象棋、中国象棋、飞行棋、狼人杀、出包魔法师、国际跳棋、阿瓦隆、围棋、五子棋。</p>
+        
+        <div id="quiz"></div>
+        <button id="submit" style="display:none;">提交测验</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "你更喜欢几人一起玩游戏？",
+                options: ["2人对抗", "3-5人小团体", "6人以上派对"],
+                weights: { strategy: 2, social: 1, casual: 0 }
+            },
+            {
+                question: "你偏好需要深度思考的策略游戏，还是轻松有趣的派对游戏？",
+                options: ["深度策略", "平衡", "轻松派对"],
+                weights: { strategy: 3, social: 1, casual: 2 }
+            },
+            {
+                question: "游戏中你更享受什么？",
+                options: ["纯逻辑推理和规划", "与朋友互动、欺骗或合作", "运气+简单策略"],
+                weights: { strategy: 3, social: 2, casual: 1 }
+            },
+            {
+                question: "你喜欢长时间对弈还是短时多轮游戏？",
+                options: ["长局深度", "短局快速", "随意"],
+                weights: { strategy: 2, social: 1, casual: 1 }
+            },
+            {
+                question: "你对抽象棋类（如围棋）还是有主题的故事游戏感兴趣？",
+                options: ["抽象纯策略", "有主题有趣味", "两者都可"],
+                weights: { strategy: 2, social: 2, casual: 1 }
+            }
+        ];
+
+        const games = {
+            "国际象棋": { strategy: 10, social: 3, casual: 2, desc: "经典2人深度策略对战" },
+            "中国象棋": { strategy: 9, social: 3, casual: 3, desc: "中国传统策略棋" },
+            "围棋": { strategy: 10, social: 2, casual: 1, desc: "极致抽象策略" },
+            "五子棋": { strategy: 7, social: 4, casual: 4, desc: "简单快速策略" },
+            "国际跳棋": { strategy: 8, social: 3, casual: 3, desc: "跳棋策略" },
+            "狼人杀": { strategy: 5, social: 10, casual: 6, desc: "社交推理派对" },
+            "阿瓦隆": { strategy: 6, social: 9, casual: 5, desc: "团队社交欺骗" },
+            "出包魔法师": { strategy: 4, social: 8, casual: 8, desc: "趣味魔法推理" },
+            "飞行棋": { strategy: 3, social: 5, casual: 10, desc: "多人运气+策略" }
+        };
+
+        let answers = [];
+        let currentQ = 0;
+
+        function buildQuiz() {
+            const quizContainer = document.getElementById('quiz');
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `<div class="question" id="q${index}" style="display: ${index === 0 ? 'block' : 'none'};">
+                    <h3>${q.question}</h3><div class="options">`;
+                q.options.forEach((opt, i) => {
+                    html += `<button onclick="selectAnswer(${index}, ${i})">${opt}</button>`;
+                });
+                html += `</div></div>`;
+            });
+            quizContainer.innerHTML = html;
+            document.getElementById('submit').style.display = 'block';
+        }
+
+        window.selectAnswer = function(qIndex, optIndex) {
+            answers[qIndex] = optIndex;
+            if (qIndex + 1 < questions.length) {
+                document.getElementById(`q${qIndex}`).style.display = 'none';
+                document.getElementById(`q${qIndex+1}`).style.display = 'block';
+            }
+        };
+
+        function calculateRecommendation() {
+            let scores = { strategy: 0, social: 0, casual: 0 };
+            answers.forEach((ansIdx, qIdx) => {
+                if (ansIdx !== undefined) {
+                    const w = questions[qIdx].weights;
+                    const multiplier = ansIdx === 0 ? 3 : ansIdx === 1 ? 1.5 : 0.5;
+                    scores.strategy += (w.strategy || 0) * multiplier;
+                    scores.social += (w.social || 0) * multiplier;
+                    scores.casual += (w.casual || 0) * multiplier;
+                }
+            });
+
+            let bestScore = -Infinity;
+            let bestGame = '';
+            Object.keys(games).forEach(game => {
+                const g = games[game];
+                const score = scores.strategy * g.strategy + scores.social * g.social + scores.casual * g.casual;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestGame = game;
+                }
+            });
+
+            return { game: bestGame, scores, desc: games[bestGame].desc };
+        }
+
+        document.getElementById('submit').addEventListener('click', () => {
+            if (answers.filter(a => a !== undefined).length < questions.length) {
+                alert('请回答所有问题！');
+                return;
+            }
+            const rec = calculateRecommendation();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <h2>🎉 推荐给你：${rec.game}</h2>
+                <p>${rec.desc}</p>
+                <div class="game-card">
+                    <p>你的偏好分数：策略 ${Math.round(rec.scores.strategy)}, 社交 ${Math.round(rec.scores.social)}, 休闲 ${Math.round(rec.scores.casual)}</p>
+                </div>
+                <button onclick="location.reload()">重新开始测验</button>
+                <p><a href="https://github.com/cqrsyt/game-recommender-quiz">查看源码</a></p>
+            `;
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('submit').style.display = 'none';
+        });
+
+        buildQuiz();
+    </script>
+</body>
+</html>
