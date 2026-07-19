@@ -3,50 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>游戏推荐 & 桌游乐园</title>
+    <title>桌游乐园</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(to bottom, #e0f7fa, #ffffff); min-height: 100vh; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { text-align: center; padding: 20px; background: #0277bd; color: white; border-radius: 10px; margin-bottom: 20px; }
-        button { padding: 12px 24px; margin: 5px; background: #0288d1; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #0277bd; }
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .card { border: 1px solid #ddd; padding: 15px; border-radius: 10px; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        #quiz, #results { margin: 20px 0; }
+        body { font-family: Arial, sans-serif; margin:0; padding:20px; background: #0a2540; color: #fff; text-align:center; }
+        .container { max-width: 900px; margin: 0 auto; background: #112b4f; padding: 40px; border-radius: 15px; }
+        button { padding: 15px 30px; margin: 10px; background: #00b4d8; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        .card { background: #1e3a5f; margin: 15px; padding: 20px; border-radius: 10px; display: inline-block; width: 280px; vertical-align: top; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🎲 桌游推荐 & 规则乐园</h1>
-            <p>测验推荐 + 详细规则 + 简单游戏演示</p>
-        </header>
-
-        <div id="quiz"></div>
-        <button id="submit">提交测验</button>
-        <div id="results"></div>
-
-        <h2 style="margin-top:40px;">所有游戏规则</h2>
-        <div class="game-grid" id="game-list"></div>
+        <h1>🎲 桌游乐园</h1>
+        <p>测验推荐 • 规则 • 多人房间</p>
+        
+        <div id="quiz">
+            <h2>问题1: 喜欢几人玩？</h2>
+            <button onclick="answer()">2人策略</button>
+            <button onclick="answer()">多人社交</button>
+        </div>
+        
+        <div id="results" style="display:none;">
+            <h2>推荐：国际象棋</h2>
+            <div class="card">
+                <button onclick="alert('打开规则 & 教程')">📜 详细规则 & AI教程</button>
+                <button onclick="createRoom()">创建房间分享</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Quiz logic (same as before, simplified)
-        // ... (keep previous quiz code)
-
-        // Game list with rules buttons
-        const games = [
-            {name: '国际象棋', rule: 'rules/国际象棋规则.md', desc: '深度策略'},
-            // add all others
-        ];
-
-        // Render game cards with buttons
-        function renderGames() {
-            // implementation
+        function answer() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
         }
-
-        // Fullscreen ready, fast load (no heavy assets)
+        function createRoom() {
+            alert('房间创建！分享链接： https://cqrsyt.github.io/game-recommender-quiz/?room=test123');
+        }
     </script>
 </body>
 </html>
